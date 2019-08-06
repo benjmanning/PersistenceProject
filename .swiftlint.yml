@@ -1,0 +1,17 @@
+# A full list of rules is available at: https://github.com/realm/SwiftLint/blob/master/Rules.md#valid-ibinspectable
+
+disabled_rules:
+ - trailing_whitespace # Overkill, does not affect the readability of code and the xcode editor is not consistent in the way it defaults the number of spaces on blank lines.
+ - vertical_whitespace # Allow more than one line of whitespace as this can be useful for code readability.
+ - force_cast # Force-cast should only be used when we are already 100% certain of the type.
+
+# Comments might reasonably have a longer line length.
+line_length: 
+  ignores_comments: true
+
+# Allow for var names such as x and y.  The context they are used in will imply their meaning.
+identifier_name:
+  min_length: 1
+
+# Allow a longer line length.  Unsuitably long lines are usually discussed in code review.
+line_length: 300
