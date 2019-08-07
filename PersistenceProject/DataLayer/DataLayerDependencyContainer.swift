@@ -26,19 +26,27 @@ class DataLayerDependencyContainer {
         includeParentRelations: true)
     }
     
-    let backgroundMoc = coreDataContainer.createBackgroundMoc()
+    let postStoreFactory: () -> (PostStore, UserStore) = {
+      let moc = coreDataContainer.createBackgroundMoc()
+      let userStore = CoreDataUserStore(
+        moc: moc)
+      let postStore = CoreDataPostStore(
+        moc: moc,
+        dataObserverFactory: dataObserverFactory)
+      return (postStore, userStore)
+    }
+    
+    let commentStoreFactory = {
+      CoreDataCommentStore(
+        moc: coreDataContainer.createBackgroundMoc())
+    }
     
     syncer = DataSyncer(
       syncer: DataSyncerEngine(),
       syncerDataReader: DataSyncerReader(
         apiClient: APIClient(),
-        userStore: CoreDataUserStore(
-          moc: backgroundMoc),
-        postStore: CoreDataPostStore(
-          moc: backgroundMoc,
-          dataObserverFactory: dataObserverFactory),
-        commentStore: CoreDataCommentStore(
-          moc: backgroundMoc)))
+        postStoreFactory: postStoreFactory,
+        commentStoreFactory: commentStoreFactory))
     
     postRepository = PersistencePostRepository(
       postStore: CoreDataPostStore(

@@ -46,6 +46,8 @@ class DataSyncer {
         modelObjs: commentData.modelObjs,
         store: commentData.store)
       commentData.store.flush()
+      
+      Logger.i("Comment sync complete")
     }
   }
   
@@ -62,6 +64,8 @@ class DataSyncer {
         modelObjs: postData.modelObjs,
         store: postData.store)
       postData.store.flush()
+      
+      Logger.i("Post sync complete")
     }
   }
   

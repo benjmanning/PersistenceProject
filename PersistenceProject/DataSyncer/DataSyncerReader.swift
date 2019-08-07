@@ -16,15 +16,17 @@ class DataSyncerReader {
   }
   
   private let apiClient: APIClient
-  private let userStore: UserStore
-  private let postStore: PostStore
-  private let commentStore: CommentStore
+  private let postStoreFactory: () -> (PostStore, UserStore)
+  private let commentStoreFactory: () -> CommentStore
 
-  init(apiClient: APIClient, userStore: UserStore, postStore: PostStore, commentStore: CommentStore) {
+  init(
+    apiClient: APIClient,
+    postStoreFactory: @escaping () -> (PostStore, UserStore),
+    commentStoreFactory: @escaping () -> CommentStore) {
+    
     self.apiClient = apiClient
-    self.userStore = userStore
-    self.postStore  = postStore
-    self.commentStore = commentStore
+    self.postStoreFactory  = postStoreFactory
+    self.commentStoreFactory = commentStoreFactory
   }
   
   func readDataForComments(
@@ -41,6 +43,7 @@ class DataSyncerReader {
     dispatchGroup.wait()
 
     if let commentsResponse = commentsResponse {
+      let commentStore = commentStoreFactory()
       let comments = commentStore.get(forPostId: postId) as [Comment]
       callback(DataForSync(dtos: commentsResponse, modelObjs: comments, store: commentStore))
     }
@@ -64,6 +67,8 @@ class DataSyncerReader {
     
     if let postsResponse = postsResponse,
       let usersResponse = usersResponse {
+      
+      let (postStore, userStore) = postStoreFactory()
       
       let posts = postStore.getAll() as [Post]
       let users = userStore.getAll()
